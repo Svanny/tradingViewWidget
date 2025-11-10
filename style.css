@@ -1,0 +1,17 @@
+/* style.css */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #0F0F0F;    /* same dark background */
+}
+
+/* container that TradingView lives in */
+.wrap {
+  width: 800px;           /* desired width  */
+  height: 1600px;         /* desired height */
+  max-width: 100%;        /* don’t overflow smaller frames */
+  max-height: 100vh;
+  margin: 0 auto;         /* center horizontally on wide screens */
+}
