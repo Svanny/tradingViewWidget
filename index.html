@@ -23,9 +23,14 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const params = new URLSearchParams(window.location.search);
-      const requested = params.get("symbol"); // e.g. "VANTAGE:SP500FT" or "PYTH:US06MY"
 
-      // Canonical list of your tabs (order you care about)
+      // You can call either ?symbol=PYTH:US06MY or ?symbol=PYTH:US06MY|3M
+      const rawSymbol = params.get("symbol");      // full query value
+      const requestedNorm = rawSymbol
+        ? rawSymbol.split("|")[0]                 // normalize: drop |timeframe
+        : null;
+
+      // Canonical list of tabs (your preferred base order)
       const allSymbols = [
         ["VANTAGE:SP500FT|3M"],
         ["PYTH:US06MY|3M"],
@@ -34,15 +39,16 @@
         ["CAPITALCOM:GOLD|3M"]
       ];
 
-      // Helper: normalize "EXCHANGE:SYMBOL" part (drop the |timeframe)
+      // Normalize helper for entries
       const norm = (s) => s.split("|")[0];
 
-      let symbols = allSymbols.slice(); // default: canonical order
+      // Default order
+      let symbols = allSymbols.slice();
 
-      if (requested) {
-        const idx = allSymbols.findIndex(entry => norm(entry[0]) === requested);
+      // If a requested symbol is present, rotate list so it comes first
+      if (requestedNorm) {
+        const idx = allSymbols.findIndex(entry => norm(entry[0]) === requestedNorm);
         if (idx !== -1) {
-          // Rotate so requested symbol comes first
           symbols = allSymbols.slice(idx).concat(allSymbols.slice(0, idx));
         }
       }
@@ -73,7 +79,7 @@
         "valuesTracking": "1",
         "changeMode": "price-and-percent",
 
-        // 🔑 this is the rotated list
+        /* 🔑 Rotated list goes here */
         "symbols": symbols,
 
         "dateRanges": [
@@ -95,6 +101,7 @@
         "hideSymbolLogo": false
       };
 
+      // Dynamically create the TradingView script with JSON config
       const script = document.createElement("script");
       script.type = "text/javascript";
       script.src = "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js";
